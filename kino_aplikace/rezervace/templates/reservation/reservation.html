@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservation</title>
+</head>
+<body>
+    <h1>Rezervujte místa</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Rezervovat</button>
+    </form>
+
+    <a href="{% url 'index' %}">Zpět na seznam filmů</a>
+</body>
+</html>
