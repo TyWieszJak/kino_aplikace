@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Seznam rezervací</title>
+</head>
+<body>
+
+    <h1>Všechny rezervace</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Jméno</th>
+                <th>Film</th>
+                <th>Počet míst</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+                <tr>
+                    <td>{{ reservation.name }}</td>
+                    <td>{{ reservation.movie }}</td>
+                    <td>{{ reservation.number_of_seats }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'reservation' %}">Přidat novou rezervaci</a>
+
+</body>
+</html>

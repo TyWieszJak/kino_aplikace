@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Seznam míst - {{ movie.title }}</title>
+</head>
+<body>
+
+    <h1>Seznam míst pro film - {{ movie.title }}</h1>
+    <ul>
+      {% for seat in seats %}
+        <li>{{ seat.row }} - {{ seat.seat_column }} - {% if seat.is_reserved %}Obsazeno{%else%}Volné{% endif %}</li>
+      {% endfor %}
+    </ul>
+</body>
+</html>

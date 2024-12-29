@@ -11,6 +11,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Rezervovat</button>
+        <a href="{% url 'movie_seats'  %}">Zobrazit mista</a>
     </form>
 
     <a href="{% url 'index' %}">Zpět na seznam filmů</a>

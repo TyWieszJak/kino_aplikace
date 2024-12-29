@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Přidat film</title>
+</head>
+<body>
+
+    <h1>Přidat film</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button type="submit">Přidat film</button>
+    </form>
+
+    <a href="{% url 'index' %}">Zpět hlavni stranku</a>
+
+</body>
+</html>

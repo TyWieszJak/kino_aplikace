@@ -10,7 +10,11 @@
         {% for movie in movies %}
             <li>
                 {{ movie.title }} ({{ movie.genre }}) - {{ movie.length}} minut
-                <a href="{% url 'reservation'%}">Rezervovat místo</a>
+                <a href="{% url 'movie_seats' movie.id %}">Rezervovat místo</a>
+                <form action="{% url 'delete_movie' movie.id %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Odstranit film</button>
+                </form>
             </li>
         {% endfor %}
     </ul>
