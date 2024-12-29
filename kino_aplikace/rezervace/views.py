@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import ReservationForm
-from.models import Movie
+from .models import Movie, Reservation
 
 
 def index(request):
@@ -18,3 +18,8 @@ def reservation(request):
         form = ReservationForm()
 
     return render(request, 'reservation/reservation.html', {'form': form})
+
+
+def list_reservation(request):
+    reservations = (Reservation.objects.all())
+    return render(request, 'reservation/list_reservation.html', {'reservations': reservations})

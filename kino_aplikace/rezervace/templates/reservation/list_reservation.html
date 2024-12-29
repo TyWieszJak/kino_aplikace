@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Seznam rezervací</title>
+</head>
+<body>
+    <h1>Seznam rezervací</h1>
+    <ul>
+        {% for rezervace in rezervace %}
+            <li>{{ rezervace.title }} - {{ rezervace.movie.title}} - {{ rezervace.seats_number}} mist</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

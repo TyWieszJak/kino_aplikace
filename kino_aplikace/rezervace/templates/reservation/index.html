@@ -7,12 +7,12 @@
 <body>
     <h1>Seznam filmů</h1>
     <ul>
-        <% for movie in movies %>
+        {% for movie in movies %}
             <li>
                 {{ movie.title }} ({{ movie.genre }}) - {{ movie.length}} minut
                 <a href="{% url 'reservation'%}">Rezervovat místo</a>
             </li>
-        <% endfor %>
+        {% endfor %}
     </ul>
 
 </body>
