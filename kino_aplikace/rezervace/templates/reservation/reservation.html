@@ -2,18 +2,29 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <title>Reservation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rezervace sedadel</title>
+    <
 </head>
 <body>
-    <h1>Rezervujte místa</h1>
+    <h1>Rezervujte místo pro film: {{ movie.title }}</h1>
 
-    <form method="post">
+    <form method="post" action="{% url 'reservation' %}">
         {% csrf_token %}
-        {{ form.as_p }}
+
+        <!-- Jméno -->
+        <label for="name">Jméno:</label>
+        <input type="text" id="name" name="name" required value="{{ user_name }}">
+
+        <!-- Skrytý input pro ID sedadla -->
+        <input type="hidden" name="seat_id" value="{{ seat.id }}">
+        <input type="hidden" name="movie_id" value="{{ movie.id }}">
+
+        <!-- Tlačítka pro odeslání a zpět -->
         <button type="submit">Rezervovat</button>
-        <a href="{% url 'movie_seats'  %}">Zobrazit mista</a>
     </form>
 
+    <!-- Tlačítko pro zpět na seznam filmů -->
     <a href="{% url 'index' %}">Zpět na seznam filmů</a>
 </body>
 </html>

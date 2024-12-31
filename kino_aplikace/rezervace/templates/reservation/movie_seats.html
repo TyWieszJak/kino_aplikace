@@ -1,16 +1,42 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
+    {% load static %}
+
     <meta charset="UTF-8">
-    <title>Seznam míst - {{ movie.title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plánek sedadel</title>
+    <link rel="stylesheet" href="{% static 'css/seat_plan.css' %}">
 </head>
 <body>
+    {% load seating_tags %}
 
-    <h1>Seznam míst pro film - {{ movie.title }}</h1>
-    <ul>
-      {% for seat in seats %}
-        <li>{{ seat.row }} - {{ seat.seat_column }} - {% if seat.is_reserved %}Obsazeno{%else%}Volné{% endif %}</li>
-      {% endfor %}
-    </ul>
+    <h1>Plánek sedadel pro film: {{ movie.title }}</h1>
+    <table class="seating-plan">
+        {% for row in rows %}
+            <tr>
+                {% for column in columns %}
+                    {% with seat=seats|get_seat:row|add:":"|add:column %}
+                        {% if seat %}
+                            <td class="seat {% if seat.is_reserved %}reserved{% else %}available{% endif %}">
+                                {% if not seat.is_reserved %}
+                                    <form method="post" action="{% url 'reserve_seat' movie_id=movie.id seat_id=seat.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit">{{ row }}{{ column }}</button>
+                                    </form>
+                                {% else %}
+                                    {{ row }}{{ column }}
+                                {% endif %}
+                            </td>
+                        {% else %}
+                            <td class="seat unavailable">{{ row }}{{ column }}</td>
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+
 </body>
 </html>

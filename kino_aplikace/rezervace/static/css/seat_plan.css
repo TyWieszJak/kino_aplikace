@@ -1,0 +1,62 @@
+/* Tabulka plánu sedadel */
+.seating-plan {
+    display: grid;
+    grid-template-columns: repeat(10, 30px); /* 10 sloupců po 30px */
+    grid-template-rows: repeat(10, 30px); /* 10 řad po 30px */
+    gap: 5px; /* Vzdálenost mezi sedadly */
+    justify-items: center;
+    align-items: center;
+    margin: 20px auto;
+}
+
+/* Styl pro sedadla */
+.seating-plan .seat {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer; /* Přidáme kurzor jako ukazatel pro interaktivní sedadla */
+}
+
+/* Styl pro dostupná sedadla */
+.seating-plan .seat.available button {
+    width: 100%;
+    height: 100%;
+    background-color: #4CAF50; /* Zelená */
+    color: white;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Styl pro rezervovaná sedadla */
+.seating-plan .seat.reserved {
+    background-color: #f44336; /* Červená */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Tlačítka pro rezervaci */
+button {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: #4CAF50; /* Zelená */
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+button:focus {
+    outline: none; /* Odstraní okraje při zaměření na tlačítko */
+}
+
+/* Pro sedadla, která nejsou dostupná */
+.seating-plan .seat.unavailable {
+    background-color: #e0e0e0; /* Světle šedá pro nedostupná sedadla */
+    color: #aaa; /* Světle šedý text */
+}
