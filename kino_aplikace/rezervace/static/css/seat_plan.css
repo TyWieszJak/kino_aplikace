@@ -1,12 +1,7 @@
 /* Tabulka plánu sedadel */
 .seating-plan {
-    display: grid;
-    grid-template-columns: repeat(10, 30px); /* 10 sloupců po 30px */
-    grid-template-rows: repeat(10, 30px); /* 10 řad po 30px */
-    gap: 5px; /* Vzdálenost mezi sedadly */
-    justify-items: center;
-    align-items: center;
-    margin: 20px auto;
+    display: table;
+    margin: 0 auto;
 }
 
 /* Styl pro sedadla */
@@ -14,7 +9,7 @@
     width: 30px;
     height: 30px;
     border: 1px solid #ccc;
-    display: flex;
+
     justify-content: center;
     align-items: center;
     cursor: pointer; /* Přidáme kurzor jako ukazatel pro interaktivní sedadla */
@@ -59,4 +54,9 @@ button:focus {
 .seating-plan .seat.unavailable {
     background-color: #e0e0e0; /* Světle šedá pro nedostupná sedadla */
     color: #aaa; /* Světle šedý text */
+}
+
+.seat button {
+    pointer-events: auto; /* Umožní klikání na tlačítka */
+    cursor: pointer; /* Ukáže ručičku při najetí na tlačítko */
 }

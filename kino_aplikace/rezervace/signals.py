@@ -8,11 +8,12 @@ def create_seats(sender, instance, created, **kwargs):
     if created:
         rows = [chr(i) for i in range(ord('A'), ord('J') + 1)]
         for row in rows:
-            for column_number in range(1,11):
+            for column_number in range(1, 11):
                 Seat.objects.create(
                     row=row,
                     seat_column=column_number,
                     seat_number=column_number,
-                    movie=instance
+                    movie=instance,
+                    is_reserved=False  # Ujistíme se, že sedadla nejsou rezervována při vytvoření
                 )
         print(f"Plan sedadel vytvořen pro film: {instance.title}")

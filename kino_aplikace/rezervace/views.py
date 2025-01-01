@@ -1,3 +1,5 @@
+from django.http import HttpResponse
+import logging
 from .forms import MovieForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ReservationForm
@@ -58,22 +60,36 @@ def delete_movie(request, movie_id):
     return redirect('index')
 
 
-def movie_seats(request, movie_id):
-    # Získání filmu podle ID
-    movie = get_object_or_404(Movie, id=movie_id)
-    # Získání všech sedadel pro tento film
-    seats = movie.seats.all()
-    # Definování řad (A až J)
-    rows = list(ascii_uppercase[:10])  # A až J
-    # Definování sloupců (1 až 10)
-    columns = list(range(1, 11))  # 1 až 10
+def generate_seat_map(seats):
+    # Předpokládejme, že sedadla mají vlastnosti 'row' a 'column'
+    # (pokud ne, můžete si upravit podle toho, jak máte definováno)
 
-    # Předání dat do šablony
+    seat_map = {}
+
+    for seat in seats:
+        # Vytvoří klíč pro každé sedadlo kombinací řady a sloupce
+        # Například 'A1', 'B2', 'C3' atd.
+        seat_key = f"{seat.row}{seat.column}"
+        seat_map[seat_key] = seat  # Přiřazení sedadla do mapy
+
+    return seat_map
+
+def movie_seats(request, movie_id):
+    movie = Movie.objects.get(id=movie_id)
+    seats = Seat.objects.filter(movie=movie)
+    rows = ['A', 'B', 'C','D',"E","F","G","H","J"]  # Příklad řad
+    columns = range(1, 11)  # Příklad sloupců (1-10)
+    seat_map = generate_seat_map(seats)
+    # Mapování sedadel podle řady a sloupce
+
+
+    #print(seat_map)  # Debug výstup, který ukáže obsah seat_map
+
     return render(request, 'reservation/movie_seats.html', {
         'movie': movie,
-        'seats': seats,
+        'seat_map': seat_map,
         'rows': rows,
-        'columns': columns
+        'columns': columns,
     })
 
 def success(request):
@@ -81,25 +97,31 @@ def success(request):
 
 
 def reserve_seat(request, movie_id, seat_id):
-    movie = Movie.objects.get(id=movie_id)
-    seat = Seat.objects.get(id=seat_id)
+    movie = get_object_or_404(Movie, id=movie_id)
+    seat = get_object_or_404(Seat, id=seat_id)
 
+
+    # Pokud je sedadlo již rezervováno, přesměruj na jinou stránku nebo zobraz chybovou hlášku.
     if seat.is_reserved:
-        messages.error(request, f"Sedadlo {seat.row}{seat.seat_column} je již obsazeno.")
-        return redirect('movie_seats', movie_id=movie.id)  # Přesměrování na plánek sedadel
+        return redirect('movie_seats', movie_id=movie.id)  # Příklad přesměrování na stránku s plánem sedadel
 
-    if request.method == 'POST':
-        # Aktualizace stavu sedadla na obsazené
-        seat.is_reserved = True
-        seat.save()
+    # Pokud ještě není rezervováno, rezervuj sedadlo
+    seat.is_reserved = True
+    seat.save()
 
-        # Případně vytvoření záznamu o rezervaci (pokud máte model rezervace)
-        # Reservation.objects.create(name=request.POST['name'], seat=seat, movie=movie)
+    # Vytvoření rezervace (pokud je potřeba)
+    if request.method == "POST":
+        reservation_form = ReservationForm(request.POST)
+        if reservation_form.is_valid():
+            reservation = reservation_form.save(commit=False)
+            reservation.movie = movie
+            reservation.seat = seat
+            reservation.save()
+            return redirect('success')  # Přesměrování na stránku s potvrzením úspěchu
+    else:
+        reservation_form = ReservationForm()
 
-        messages.success(request, f"Sedadlo {seat.row}{seat.seat_column} bylo úspěšně rezervováno.")
-        return redirect('movie_seats', movie_id=movie.id)
+    return render(request, 'reservation/movie_seats.html', {'movie': movie, 'seat': seat, 'reservation_form': reservation_form})
 
-    return render(request, 'reservation/reserve_seat.html', {
-        'movie': movie,
-        'seat': seat,
-    })
+
+
