@@ -1,43 +1,43 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     {% load static %}
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plánek sedadel pro film: {{ movie.title }}</title>
+    <title>Rezervace sedadla</title>
     <link rel="stylesheet" href="{% static 'css/seat_plan.css' %}">
 </head>
 <body>
-    {% load seating_tags %}
+    <h1>Rezervace sedadla {{ seat.row }}{{ seat.seat_column }}</h1>
+    <p>Film: {{ movie.title }}</p>
 
-    <h1>Plánek sedadel pro film: {{ movie.title }}</h1>
-    <pre>{{ seat_map|safe }}</pre> <!-- Přidáno pro debug -->
-    <table class="seating-plan">
-    {% for row in rows %}
-        <tr>
-            {% for column in columns %}
-                {% with seat=seat_map|get_item:row|stringformat:"s"|add:column %}
-                    {% if seat %}
-                        <td class="seat {% if seat.is_reserved %}reserved{% else %}available{% endif %}">
-                            <p>{{ seat.seat_number }}</p>
-                            <p>{{ seat.is_reserved }}</p>
+    <h2>Plánek sedadel</h2>
+    <table>
 
+        {% for row_seats in seat_map %}
+            <tr>
+                {% for seat in row_seats %}
+                    <td class="{% if seat and seat.is_reserved %}reserved{% else %}available{% endif %}">
+                        {% if seat %}
                             {% if seat.is_reserved %}
-                                <span>{{ row }}{{ column }} (Obsazeno)</span>
+                                {{ seat.row }}{{ seat.seat_column }}<br>Obsazeno
                             {% else %}
-                                <form method="post" action="{% url 'reserve_seat' movie_id=movie.id seat_id=seat.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit">{{ row }}{{ column }} (Rezervovat)</button>
-                                </form>
+                                <a href="{% url 'reserve_seat' movie_id=movie.id seat_id=seat.id %}">
+                                    {{ seat.row }}{{ seat.seat_column }}<br>Rezervovat
+                                </a>
                             {% endif %}
-                        </td>
-                    {% else %}
-                        <td class="seat unavailable">{{ row }}{{ column }}</td>
-                    {% endif %}
-                {% endwith %}
-            {% endfor %}
-        </tr>
-    {% endfor %}
-</table>
+                        {% else %}
+                            Prázdné
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
+
+
+
+    <a href="{% url 'movie_seats' movie_id=movie.id %}">Zpět na plán sedadel</a>
 </body>
 </html>

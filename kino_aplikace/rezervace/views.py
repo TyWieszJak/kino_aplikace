@@ -54,42 +54,36 @@ def add_film(request):
         form = MovieForm()
 
     return render(request, 'reservation/add_film.html', {'form': form})
+
 def delete_movie(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
     movie.delete()
     return redirect('index')
 
 
-def generate_seat_map(seats):
-    # Předpokládejme, že sedadla mají vlastnosti 'row' a 'column'
-    # (pokud ne, můžete si upravit podle toho, jak máte definováno)
-
-    seat_map = {}
-
-    for seat in seats:
-        # Vytvoří klíč pro každé sedadlo kombinací řady a sloupce
-        # Například 'A1', 'B2', 'C3' atd.
-        seat_key = f"{seat.row}{seat.column}"
-        seat_map[seat_key] = seat  # Přiřazení sedadla do mapy
-
-    return seat_map
-
 def movie_seats(request, movie_id):
-    movie = Movie.objects.get(id=movie_id)
-    seats = Seat.objects.filter(movie=movie)
-    rows = ['A', 'B', 'C','D',"E","F","G","H","J"]  # Příklad řad
-    columns = range(1, 11)  # Příklad sloupců (1-10)
-    seat_map = generate_seat_map(seats)
-    # Mapování sedadel podle řady a sloupce
+    # Získání filmu podle ID
+    movie = get_object_or_404(Movie, id=movie_id)
+    # Získání všech sedadel pro tento film
+    seats = movie.seats.all()
+    # Definování řad (A až J)
+    rows = list(ascii_uppercase[:10])  # A až J
+    # Definování sloupců (1 až 10)
+    columns = list(range(1, 11))  # 1 až 10
 
+    # Generování plánu sedadel
+    seat_map = [[None for _ in columns] for _ in rows]
+    for seat in seats:
+        row_index = rows.index(seat.row)
+        column_index = columns.index(seat.seat_column)
+        seat_map[row_index][column_index] = seat
 
-    #print(seat_map)  # Debug výstup, který ukáže obsah seat_map
-
+    # Vždy vrátit render
     return render(request, 'reservation/movie_seats.html', {
         'movie': movie,
         'seat_map': seat_map,
         'rows': rows,
-        'columns': columns,
+        'columns': columns
     })
 
 def success(request):
@@ -97,31 +91,47 @@ def success(request):
 
 
 def reserve_seat(request, movie_id, seat_id):
+    # Získání filmu a sedadla podle ID
     movie = get_object_or_404(Movie, id=movie_id)
     seat = get_object_or_404(Seat, id=seat_id)
 
-
-    # Pokud je sedadlo již rezervováno, přesměruj na jinou stránku nebo zobraz chybovou hlášku.
     if seat.is_reserved:
-        return redirect('movie_seats', movie_id=movie.id)  # Příklad přesměrování na stránku s plánem sedadel
+        return redirect('movie_seats', movie_id=movie.id)
 
-    # Pokud ještě není rezervováno, rezervuj sedadlo
-    seat.is_reserved = True
-    seat.save()
-
-    # Vytvoření rezervace (pokud je potřeba)
-    if request.method == "POST":
-        reservation_form = ReservationForm(request.POST)
-        if reservation_form.is_valid():
-            reservation = reservation_form.save(commit=False)
+    if request.method == 'POST':
+        form = ReservationForm(request.POST)
+        if form.is_valid():
+            # Vytvoření rezervace
+            reservation = form.save(commit=False)
             reservation.movie = movie
             reservation.seat = seat
+            reservation.number_of_seats = 1
             reservation.save()
-            return redirect('success')  # Přesměrování na stránku s potvrzením úspěchu
+
+            # Aktualizujte stav sedadla
+            seat.is_reserved = True
+            seat.save()
+
+            return redirect('movie_seats', movie_id=movie.id)
+
     else:
-        reservation_form = ReservationForm()
+        form = ReservationForm()
 
-    return render(request, 'reservation/movie_seats.html', {'movie': movie, 'seat': seat, 'reservation_form': reservation_form})
+    # Předání všech potřebných dat do šablony
+    rows = list(ascii_uppercase[:10])  # A-J řady
+    columns = list(range(1, 11))  # Sloupce 1-10
 
+    # Vytvoření plánu sedadel pro zobrazení
+    seat_map = [[None for _ in columns] for _ in rows]
+    seats = movie.seats.all()
+    for seat in seats:
+        row_index = rows.index(seat.row)
+        column_index = columns.index(seat.seat_column)
+        seat_map[row_index][column_index] = seat
 
-
+    return render(request, 'reservation/reserve_seat.html', {
+        'movie': movie,
+        'seat': seat,
+        'seat_map': seat_map,  # Posíláme celý plán sedadel
+        'form': form
+    })
