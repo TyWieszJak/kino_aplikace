@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Rezervace sedadla</title>
+
+</head>
+<body>
+    <h1>Rezervace sedadla {{ seat.row }}{{ seat.seat_column }}</h1>
+    <p>Film: {{ movie.title }}</p>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Potvrdit rezervaci</button>
+    </form>
+
+
+    <a href="{% url 'movie_seats' movie_id=movie.id %}">Zpět domu</a>
+</body>
+</html>

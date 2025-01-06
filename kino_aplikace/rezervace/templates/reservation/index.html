@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
     <title>Seznam filmů</title>
 </head>
 <body>
@@ -10,10 +12,10 @@
         {% for movie in movies %}
             <li>
                 {{ movie.title }} ({{ movie.genre }}) - {{ movie.length}} minut
-                <a href="{% url 'movie_seats' movie.id %}">Rezervovat místo</a>
+                <a class=button href="{% url 'movie_seats' movie.id %}">Rezervovat místo</a>
                 <form action="{% url 'delete_movie' movie.id %}" method="POST" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit">Odstranit film</button>
+                    <button class=delete_movie type="submit">Odstranit film</button>
                 </form>
             </li>
         {% endfor %}
