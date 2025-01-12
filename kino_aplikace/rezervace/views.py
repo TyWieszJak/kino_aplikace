@@ -9,7 +9,7 @@ from django.contrib import messages
 
 
 def index(request):
-    movies = (Movie.objects.all())  # Získání všech filmů z databáze
+    movies = (Movie.objects.all())
     return render(request, 'reservation/index.html', {'movies': movies})
 
 
@@ -17,11 +17,8 @@ def reservation(request):
     if request.method == "POST":
         form = ReservationForm(request.POST)
         if form.is_valid():
-            # Získání vybraného sedadla
             seat_id = request.POST.get("seat_id")
             seat = get_object_or_404(Seat, id=seat_id)
-
-            # Získání filmu (měl by být součástí URL nebo session)
             movie_id = request.POST.get("movie_id")  # Předpokládáme, že movie_id je v POST datech
             movie = get_object_or_404(Movie, id=movie_id)
 
@@ -29,8 +26,6 @@ def reservation(request):
             reservation.seat = seat
             reservation.movie = movie
             reservation.save()
-
-            # Nastavení sedadla na rezervováno
             seat.is_reserved = True
             seat.save()
 
@@ -62,23 +57,19 @@ def delete_movie(request, movie_id):
 
 
 def movie_seats(request, movie_id):
-    # Získání filmu podle ID
     movie = get_object_or_404(Movie, id=movie_id)
-    # Získání všech sedadel pro tento film
     seats = movie.seats.all()
-    # Definování řad (A až J)
     rows = list(ascii_uppercase[:10])  # A až J
-    # Definování sloupců (1 až 10)
     columns = list(range(1, 11))  # 1 až 10
 
-    # Generování plánu sedadel
+
     seat_map = [[None for _ in columns] for _ in rows]
     for seat in seats:
         row_index = rows.index(seat.row)
         column_index = columns.index(seat.seat_column)
         seat_map[row_index][column_index] = seat
 
-    # Vždy vrátit render
+
     return render(request, 'reservation/movie_seats.html', {
         'movie': movie,
         'seat_map': seat_map,
@@ -91,7 +82,7 @@ def success(request):
 
 
 def reserve_seat(request, movie_id, seat_id):
-    # Získání filmu a sedadla podle ID
+
     movie = get_object_or_404(Movie, id=movie_id)
     seat = get_object_or_404(Seat, id=seat_id)
 
@@ -101,14 +92,14 @@ def reserve_seat(request, movie_id, seat_id):
     if request.method == 'POST':
         form = ReservationForm(request.POST)
         if form.is_valid():
-            # Vytvoření rezervace
+
             reservation = form.save(commit=False)
             reservation.movie = movie
             reservation.seat = seat
             reservation.number_of_seats = 1
             reservation.save()
 
-            # Aktualizujte stav sedadla
+
             seat.is_reserved = True
             seat.save()
 
@@ -117,11 +108,11 @@ def reserve_seat(request, movie_id, seat_id):
     else:
         form = ReservationForm()
 
-    # Předání všech potřebných dat do šablony
+
     rows = list(ascii_uppercase[:10])  # A-J řady
     columns = list(range(1, 11))  # Sloupce 1-10
 
-    # Vytvoření plánu sedadel pro zobrazení
+
     seat_map = [[None for _ in columns] for _ in rows]
     seats = movie.seats.all()
     for seat in seats:
