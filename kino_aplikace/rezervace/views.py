@@ -19,7 +19,7 @@ def reservation(request):
         if form.is_valid():
             seat_id = request.POST.get("seat_id")
             seat = get_object_or_404(Seat, id=seat_id)
-            movie_id = request.POST.get("movie_id")  # Předpokládáme, že movie_id je v POST datech
+            movie_id = request.POST.get("movie_id")
             movie = get_object_or_404(Movie, id=movie_id)
 
             reservation = form.save(commit=False)
